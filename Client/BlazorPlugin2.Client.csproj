@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="bin\Debug\net6.0\wwwroot\_framework\RazorClassLibrary2.dll">
+        <Content Include="bin\Debug\net8.0\wwwroot\_framework\RazorClassLibrary2.dll">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
