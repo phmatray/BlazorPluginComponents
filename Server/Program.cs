@@ -1,9 +1,6 @@
-using Microsoft.AspNetCore.ResponseCompression;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
@@ -30,7 +27,6 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseRouting();
-
 
 app.MapRazorPages();
 app.MapControllers();

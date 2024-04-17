@@ -1,12 +1,4 @@
 ﻿@page "/module"
-@using System.Net.Http.Headers;
-@using BlazorPlugin2.Shared;
-@using System.Runtime.Loader
-@using System.Reflection
-@inject IPackageRepository repo;
-@inject HttpClient Http;
-@inject NavigationManager MyNavigationManager
-@inject Interop DOMinterop;
 
 <PageTitle>Module Manager</PageTitle>
 
@@ -24,7 +16,7 @@ Register Nuget Package (nupkg file)
         </tr>
     </thead>
     <tbody>
-    @foreach(var package in packages)
+    @foreach(var package in _packages)
     {
         <tr>
             <td>@package.Name</td>
@@ -32,7 +24,7 @@ Register Nuget Package (nupkg file)
             <td>
                 @if (package.IsLoaded)
                 {
-                    <select @onchange="(e) => LoadComponent(e, package)">
+                    <select @onchange="e => LoadComponent(e, package)">
                         @foreach (var component in package.Components)
                         {
                             <option value="@component.Item1">(@component.Item2) @component.Item1</option>
@@ -49,52 +41,10 @@ Register Nuget Package (nupkg file)
     </tbody>
 </table>
 
-@foreach (var component in components)
+@foreach (var component in _components)
 {
 	if (component != null)
 	{
 		<DynamicComponent Type="@component" />
 	}
-}
-
-@code
-{
-    List<Package> packages = new();
-	  private List<Type?> components = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        packages = await repo.GetList();
-    }
-
-    private async Task OnInputFileChange(InputFileChangeEventArgs e)
-    {
-        await repo.Upload(e.File);
-    }
-
-    private async Task Load(Package package)
-    {
-        await repo.Load(package);
-    }
-
-    private void LoadComponent(ChangeEventArgs changeEventArgs, Package package)
-    {
-        string component = changeEventArgs.Value?.ToString() ?? "";
-
-        components.Add(package.Assembly?.GetType(component));
-
-        foreach(var asset in package.Assets)
-        {
-            var id = package.Name + asset.Item2.Substring(0, asset.Item2.LastIndexOf("."));
-
-            if (asset.Item1 == "css")
-            {
-                DOMinterop.IncludeLink(id, $"/_content/{package.Name}/{asset.Item2}");
-            }
-            else if(asset.Item1 == "js")
-            {
-                DOMinterop.IncludeScript(id, $"/_content/{package.Name}/{asset.Item2}");
-            }
-        }
-    }
 }

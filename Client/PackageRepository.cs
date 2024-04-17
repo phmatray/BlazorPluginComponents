@@ -7,32 +7,26 @@ using System.Xml;
 
 namespace BlazorPlugin2.Client;
 
-public class PackageRepository : IPackageRepository
+public class PackageRepository(HttpClient http, NavigationManager myNavigationManager)
+    : IPackageRepository
 {
-    private readonly HttpClient Http;
-    private readonly NavigationManager MyNavigationManager;
-    private List<Package> packages = new();
-
-    public PackageRepository(HttpClient http, NavigationManager myNavigationManager)
-    {
-        Http = http;
-        MyNavigationManager = myNavigationManager;
-    }
+    private List<Package> _packages = [];
 
     public async Task<List<Package>> GetList()
     {
-        if (packages.Count == 0)
+        if (_packages.Count == 0)
         {
-            var result = await Http.GetFromJsonAsync<List<Package>>("/ModuleManager");
-            if (result != null) packages = result;
+            var result = await http.GetFromJsonAsync<List<Package>>("/ModuleManager");
+            if (result != null)
+                _packages = result;
         }
 
-        return packages;
+        return _packages;
     }
 
     public bool CheckLoaded(string package)
     {
-        return packages.Any(s => s.Name == package && s.IsLoaded);
+        return _packages.Any(s => s.Name == package && s.IsLoaded);
     }
 
     public async Task Upload(IBrowserFile file)
@@ -42,9 +36,8 @@ public class PackageRepository : IPackageRepository
 
         try
         {
-            var response = await Http.PostAsync("/ModuleManager", content);
-
-            var value = await response.Content.ReadAsStringAsync();
+            var response = await http.PostAsync("/ModuleManager", content);
+            var _ = await response.Content.ReadAsStringAsync();
         }
         catch(Exception ex)
         {
@@ -58,12 +51,12 @@ public class PackageRepository : IPackageRepository
 
         try
         {
-            var stream = await Http.GetStreamAsync($"{MyNavigationManager.BaseUri}/_content/{package.Name}/{package.Name}.dll");
+            var stream = await http.GetStreamAsync($"{myNavigationManager.BaseUri}/_content/{package.Name}/{package.Name}.dll");
             var assembly = AssemblyLoadContext.Default.LoadFromStream(stream);
             package.Assembly = assembly;
             try
             {
-                var stream2 = await Http.GetStreamAsync($"{MyNavigationManager.BaseUri}/_content/{package.Name}/{package.Name}.pdb");
+                var stream2 = await http.GetStreamAsync($"{myNavigationManager.BaseUri}/_content/{package.Name}/{package.Name}.pdb");
                 var symbols = AssemblyLoadContext.Default.LoadFromStream(stream2);
                 package.Symbols = symbols;
             }
@@ -81,16 +74,24 @@ public class PackageRepository : IPackageRepository
         }
 
         // Find List of assets to load
-        var stream3 = await Http.GetStreamAsync($"{MyNavigationManager.BaseUri}/_content/{package.Name}/Microsoft.AspNetCore.StaticWebAssets.props");
+        var stream3 = await http.GetStreamAsync($"{myNavigationManager.BaseUri}/_content/{package.Name}/Microsoft.AspNetCore.StaticWebAssets.props");
         XmlDocument assetsList = new XmlDocument();
         assetsList.Load(stream3);
         foreach (XmlNode asset in assetsList.GetElementsByTagName("StaticWebAsset"))
         {
             var content = asset.SelectSingleNode("RelativePath")?.InnerText;
+
+            if (content is null)
+                continue;
+            
             if (content.EndsWith(".js"))
+            {
                 package.Assets.Add(("js", content));
+            }
             else if (content.EndsWith(".css"))
+            {
                 package.Assets.Add(("css", content));
+            }
         }
 
         return true;

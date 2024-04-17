@@ -1,22 +1,14 @@
-using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace BlazorPlugin2.Client;
 
-public class Interop
+public class Interop(IJSRuntime jsRuntime)
 {
-    private readonly IJSRuntime _jsRuntime;
-
-    public Interop(IJSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
-
     public Task IncludeLink(string id, string href)
     {
         try
         {
-            _jsRuntime.InvokeVoidAsync("BlazorPlugin2.Interop.includeLink", id, href);
+            jsRuntime.InvokeVoidAsync("BlazorPlugin2.Interop.includeLink", id, href);
             return Task.CompletedTask;
         }
         catch
@@ -29,7 +21,7 @@ public class Interop
     {
         try
         {
-            _jsRuntime.InvokeVoidAsync("BlazorPlugin2.Interop.addLink", id, style, place);
+            jsRuntime.InvokeVoidAsync("BlazorPlugin2.Interop.addLink", id, style, place);
             return Task.CompletedTask;
         }
         catch
@@ -42,7 +34,7 @@ public class Interop
     {
         try
         {
-            _jsRuntime.InvokeVoidAsync("BlazorPlugin2.Interop.includeScript", id, src);
+            jsRuntime.InvokeVoidAsync("BlazorPlugin2.Interop.includeScript", id, src);
             return Task.CompletedTask;
         }
         catch

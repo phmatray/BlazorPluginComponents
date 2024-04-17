@@ -1,12 +1,4 @@
 ﻿@page "/"
-@using System.Reflection
-@using Microsoft.AspNetCore.Components.WebAssembly.Services
-@using System.Runtime.Loader
-@using System.IO;
-@using System.Text
-@inject HttpClient Http
-@inject Interop DOMinterop;
-@inject NavigationManager MyNavigationManager
 
 <PageTitle>Index</PageTitle>
 
@@ -16,9 +8,9 @@
 
 <p>The <strong>RazorClassLibrary2</strong> is loaded from a url in the server with its assets</p>
 
-@if (componentType != null)
+@if (_componentType != null)
 {
-	<DynamicComponent Type="@componentType" />
+	<DynamicComponent Type="@_componentType" />
 }
 
 <p>You can select a dll file and their assets to load another components dynamically</p>
@@ -26,76 +18,17 @@
 <InputFile OnChange="@LoadFiles" multiple />
 <button type="button" class="btn btn-primary" @onclick="ConfirmUpdate">Upload</button>
 
-@if (componentType2 != null)
+@if (_componentType2 != null)
 {
-	<DynamicComponent Type="@componentType2" />
+	<DynamicComponent Type="@_componentType2" />
 }
 
-@if (types != null)
+@if (_types != null)
 {
-	<select @onchange='(e) => componentType2 = assembly?.GetType(e.Value?.ToString() ?? "")'>
-	@foreach(var type in types)
+	<select @onchange='e => _componentType2 = _assembly?.GetType(e.Value?.ToString() ?? "")'>
+	@foreach(var type in _types)
 	{
 		<option value="@type.FullName">(@type.BaseType?.Name) @type.Name</option>
 	}
 	</select>
-}
-
-@code
-{
-	private Type? componentType;
-	private Type? componentType2;
-	private Assembly? assembly;
-	private List<IBrowserFile> files = new();
-	private List<Type>? types;
-
-	protected override async Task OnInitializedAsync()
-	{
-		try {
-			var componentPackage = "RazorClassLibrary2";
-			var component = "Component2";
-			var stream = await Http.GetStreamAsync($"{MyNavigationManager.BaseUri}/{componentPackage}/{componentPackage}.dll");
-			var assembly = AssemblyLoadContext.Default.LoadFromStream(stream);
-			componentType = assembly.GetType(componentPackage + "." + component);
-			await DOMinterop.IncludeLink(componentPackage, $"/{componentPackage}/{componentPackage}.styles.css");
-		}
-		catch(Exception ex)
-		{
-			Console.WriteLine(ex.Message);
-		}
-	}
-
-	private void LoadFiles(InputFileChangeEventArgs e)
-	{
-		files = e.GetMultipleFiles().ToList();
-	}
-
-	private async void ConfirmUpdate()
-	{
-		try {
-			foreach(var file in files)
-			{
-				if (file.Name.EndsWith(".dll"))
-				{
-					using MemoryStream ms = new();
-					await file.OpenReadStream().CopyToAsync(ms);
-					var bytes = ms.ToArray();
-					assembly = Assembly.Load(bytes);
-					var assemblyName = assembly.GetName().Name ?? "";
-					types = assembly.GetExportedTypes().ToList();
-				}
-				else if(file.Name.EndsWith(".css"))
-				{
-					using StreamReader ms = new(file.OpenReadStream());
-					var css = await ms.ReadToEndAsync();
-					await DOMinterop.AddLink(file.Name, css);
-				}
-			}
-			StateHasChanged();
-		}
-		catch(Exception ex)
-		{
-			Console.WriteLine(ex.Message);
-		}
-	}
 }

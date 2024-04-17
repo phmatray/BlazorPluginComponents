@@ -9,27 +9,23 @@ namespace RazorClassLibrary3
     // This class can be registered as scoped DI service and then injected into Blazor
     // components for use.
 
-    public class ExampleJsInterop : IAsyncDisposable
+    public class ExampleJsInterop(IJSRuntime jsRuntime)
+        : IAsyncDisposable
     {
-        private readonly Lazy<Task<IJSObjectReference>> moduleTask;
-
-        public ExampleJsInterop(IJSRuntime jsRuntime)
-        {
-            moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/RazorClassLibrary3/exampleJsInterop.js").AsTask());
-        }
+        private readonly Lazy<Task<IJSObjectReference>> _moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
+            "import", "./_content/RazorClassLibrary3/exampleJsInterop.js").AsTask());
 
         public async ValueTask<string> Prompt(string message)
         {
-            var module = await moduleTask.Value;
+            var module = await _moduleTask.Value;
             return await module.InvokeAsync<string>("showPrompt", message);
         }
 
         public async ValueTask DisposeAsync()
         {
-            if (moduleTask.IsValueCreated)
+            if (_moduleTask.IsValueCreated)
             {
-                var module = await moduleTask.Value;
+                var module = await _moduleTask.Value;
                 await module.DisposeAsync();
             }
         }
