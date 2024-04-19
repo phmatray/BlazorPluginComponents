@@ -28,13 +28,16 @@ public class PackageRepository(
         {
             return _packages;
         }
-        
-        var result = await http.GetFromJsonAsync<List<Package>>(ModuleManagerUrl);
-        if (result != null)
-        {
-            _packages = result;
-        }
 
+        try
+        {
+            _packages = await http.GetFromJsonAsync<List<Package>>(ModuleManagerUrl) ?? [];
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        
         return _packages;
     }
 
@@ -64,25 +67,27 @@ public class PackageRepository(
     /// <inheritdoc/>
     public async Task<bool> Load(Package package)
     {
-        if(package.Name != null && CheckLoaded(package.Name)) return true;
+        if(package.Name != null && CheckLoaded(package.Name))
+        {
+            return true;
+        }
 
         try
         {
-            var stream = await http.GetStreamAsync($"{navigationManager.BaseUri}/_content/{package.Name}/{package.Name}.dll");
-            var assembly = AssemblyLoadContext.Default.LoadFromStream(stream);
-            package.Assembly = assembly;
+            var assemblyStream = await http.GetStreamAsync($"{navigationManager.BaseUri}/_content/{package.Name}/{package.Name}.dll");
+            var assembly = AssemblyLoadContext.Default.LoadFromStream(assemblyStream);
+            package.LoadAssembly(assembly);
+            
             try
             {
-                var stream2 = await http.GetStreamAsync($"{navigationManager.BaseUri}/_content/{package.Name}/{package.Name}.pdb");
-                var symbols = AssemblyLoadContext.Default.LoadFromStream(stream2);
-                package.Symbols = symbols;
+                var symbolsStream = await http.GetStreamAsync($"{navigationManager.BaseUri}/_content/{package.Name}/{package.Name}.pdb");
+                var symbols = AssemblyLoadContext.Default.LoadFromStream(symbolsStream);
+                package.LoadSymbols(symbols);
             }
             catch
             {
                 Console.WriteLine($"No symbols loaded for {package.Name}");
             }
-            package.Components = assembly.GetExportedTypes().Select(s => (s.FullName ?? "", s.BaseType?.Name ?? "")).ToList();
-            package.IsLoaded = true;
         }
         catch (Exception ex)
         {
@@ -91,25 +96,10 @@ public class PackageRepository(
         }
 
         // Find List of assets to load
-        var stream3 = await http.GetStreamAsync($"{navigationManager.BaseUri}/_content/{package.Name}/Microsoft.AspNetCore.StaticWebAssets.props");
+        var assetsStream = await http.GetStreamAsync($"{navigationManager.BaseUri}/_content/{package.Name}/Microsoft.AspNetCore.StaticWebAssets.props");
         XmlDocument assetsList = new XmlDocument();
-        assetsList.Load(stream3);
-        foreach (XmlNode asset in assetsList.GetElementsByTagName("StaticWebAsset"))
-        {
-            var content = asset.SelectSingleNode("RelativePath")?.InnerText;
-
-            if (content is null)
-                continue;
-            
-            if (content.EndsWith(".js"))
-            {
-                package.Assets.Add(("js", content));
-            }
-            else if (content.EndsWith(".css"))
-            {
-                package.Assets.Add(("css", content));
-            }
-        }
+        assetsList.Load(assetsStream);
+        package.ParseAssetDetailsFromXml(assetsList);
 
         return true;
     }
