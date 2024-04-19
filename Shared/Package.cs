@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Xml;
 
 namespace BlazorPlugin2.Shared;
 
@@ -53,7 +54,7 @@ public class Package
     /// <value>
     /// The main assembly of the package, if loaded.
     /// </value>
-    public Assembly? Assembly { get; set; }
+    public Assembly? Assembly { get; private set; }
     
     /// <summary>
     /// Gets or sets the symbols assembly for the package, which may include debugging symbols.
@@ -61,5 +62,49 @@ public class Package
     /// <value>
     /// The assembly containing debugging symbols for the package, if loaded.
     /// </value>
-    public Assembly? Symbols { get; set; }
+    public Assembly? Symbols { get; private set; }
+
+    public void LoadAssembly(Assembly assembly)
+    {
+        Assembly = assembly;
+        
+        Components = assembly
+            .GetExportedTypes()
+            .Select(s => (s.FullName ?? "", s.BaseType?.Name ?? ""))
+            .ToList();
+        
+        IsLoaded = true;
+    }
+    
+    public void LoadSymbols(Assembly symbols)
+    {
+        Symbols = symbols;
+    }
+
+    public void AddAsset(string type, string path)
+    {
+        Assets.Add((type, path));
+    }
+
+    public void ParseAssets(XmlDocument assetsList)
+    {
+        foreach (XmlNode asset in assetsList.GetElementsByTagName("StaticWebAsset"))
+        {
+            var content = asset.SelectSingleNode("RelativePath")?.InnerText;
+
+            if (content is null)
+            {
+                continue;
+            }
+            
+            if (content.EndsWith(".js"))
+            {
+                AddAsset("js", content);
+            }
+            else if (content.EndsWith(".css"))
+            {
+                AddAsset("css", content);
+            }
+        }
+    }
 }
