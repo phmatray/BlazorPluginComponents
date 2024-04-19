@@ -1,3 +1,4 @@
+using BlazorPlugin2.Client.Services;
 using BlazorPlugin2.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -19,7 +20,7 @@ public partial class ModuleManager
     public required NavigationManager MyNavigationManager { get; set; }
     
     [Inject]
-    public required Interop DOMInterop { get; set; }
+    public required IInterop DOMInterop { get; set; }
     
     protected override async Task OnInitializedAsync()
     {

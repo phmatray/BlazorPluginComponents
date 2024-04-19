@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.Loader;
+using BlazorPlugin2.Client.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -17,7 +18,7 @@ public partial class Index
     public required HttpClient Http { get; set; }
     
     [Inject]
-    public required Interop DOMInterop { get; set; }
+    public required IInterop DOMInterop { get; set; }
     
     [Inject]
     public required NavigationManager MyNavigationManager { get; set; }

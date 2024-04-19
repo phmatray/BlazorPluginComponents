@@ -1,9 +1,14 @@
 using Microsoft.JSInterop;
 
-namespace BlazorPlugin2.Client;
+namespace BlazorPlugin2.Client.Services;
 
-public class Interop(IJSRuntime jsRuntime)
+/// <summary>
+/// Provides JavaScript interop functionalities for a Blazor application.
+/// </summary>
+/// <param name="jsRuntime">The JSRuntime instance used for JS interop calls.</param>
+public class Interop(IJSRuntime jsRuntime) : IInterop
 {
+    /// <inheritdoc/>
     public Task IncludeLink(string id, string href)
     {
         try
@@ -17,6 +22,7 @@ public class Interop(IJSRuntime jsRuntime)
         }
     }
 
+    /// <inheritdoc/>
     public Task AddLink(string id, string style, string place = "head")
     {
         try
@@ -30,6 +36,7 @@ public class Interop(IJSRuntime jsRuntime)
         }
     }
 
+    /// <inheritdoc/>
     public Task IncludeScript(string id, string src)
     {
         try

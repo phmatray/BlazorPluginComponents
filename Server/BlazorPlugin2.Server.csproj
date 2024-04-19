@@ -20,6 +20,14 @@
         <DestinationFiles Include="$(ProjectDir)\wwwroot\RazorClassLibrary2\RazorClassLibrary2.dll;$(ProjectDir)\wwwroot\RazorClassLibrary2\RazorClassLibrary2.styles.css;$(ProjectDir)\wwwroot\RazorClassLibrary2\background.png"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\_content\RazorClassLibrary3\background.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\_content\RazorClassLibrary3\exampleJsInterop.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\_content\RazorClassLibrary3\Microsoft.AspNetCore.StaticWebAssets.props" />
+      <_ContentIncludedByDefault Remove="wwwroot\_content\RazorClassLibrary3\RazorClassLibrary3.bundle.scp.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\_content\RazorClassLibrary3\RazorClassLibrary3.dll" />
+    </ItemGroup>
+
     <Target Name="CopyFilesTargetName" AfterTargets="Build">
         <Copy SkipUnchangedFiles="true" SourceFiles="@(SourceFiles)" DestinationFiles="@(DestinationFiles)"/>
     </Target>
