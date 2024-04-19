@@ -28,8 +28,16 @@ public class PackageRepository(
         {
             return _packages;
         }
+
+        try
+        {
+            _packages = await http.GetFromJsonAsync<List<Package>>(ModuleManagerUrl) ?? [];
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
         
-        _packages = await http.GetFromJsonAsync<List<Package>>(ModuleManagerUrl) ?? [];
         return _packages;
     }
 
@@ -91,7 +99,7 @@ public class PackageRepository(
         var assetsStream = await http.GetStreamAsync($"{navigationManager.BaseUri}/_content/{package.Name}/Microsoft.AspNetCore.StaticWebAssets.props");
         XmlDocument assetsList = new XmlDocument();
         assetsList.Load(assetsStream);
-        package.ParseAssets(assetsList);
+        package.ParseAssetDetailsFromXml(assetsList);
 
         return true;
     }

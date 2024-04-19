@@ -29,17 +29,17 @@ public partial class App
         }
     }
 
-    private async Task LoadAsset(Package package, (string Type, string Path) asset)
+    private async Task LoadAsset(Package package, Asset asset)
     { 
-        var id = $"{package.Name}{asset.Item2[..asset.Item2.LastIndexOf('.')]}";
+        var id = $"{package.Name}{asset.Path[..asset.Path.LastIndexOf('.')]}";
 
-        switch (asset.Item1)
+        switch (asset.Type)
         {
             case "css":
-                await DOMInterop.IncludeLink(id, $"/_content/{package.Name}/{asset.Item2}");
+                await DOMInterop.IncludeLink(id, $"/_content/{package.Name}/{asset.Path}");
                 break;
             case "js":
-                await DOMInterop.IncludeScript(id, $"/_content/{package.Name}/{asset.Item2}");
+                await DOMInterop.IncludeScript(id, $"/_content/{package.Name}/{asset.Path}");
                 break;
         }
     }

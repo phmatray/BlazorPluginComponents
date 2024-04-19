@@ -40,20 +40,19 @@ public partial class ModuleManager
     private void LoadComponent(ChangeEventArgs changeEventArgs, Package package)
     {
         string component = changeEventArgs.Value?.ToString() ?? "";
-
         _components.Add(package.Assembly?.GetType(component));
 
         foreach (var asset in package.Assets)
         {
-            var id = $"{package.Name}{asset.Item2[..asset.Item2.LastIndexOf('.')]}";
+            var id = $"{package.Name}{asset.Path[..asset.Path.LastIndexOf('.')]}";
 
-            switch (asset.Item1)
+            switch (asset.Type)
             {
                 case "css":
-                    DOMInterop.IncludeLink(id, $"/_content/{package.Name}/{asset.Item2}");
+                    DOMInterop.IncludeLink(id, $"/_content/{package.Name}/{asset.Path}");
                     break;
                 case "js":
-                    DOMInterop.IncludeScript(id, $"/_content/{package.Name}/{asset.Item2}");
+                    DOMInterop.IncludeScript(id, $"/_content/{package.Name}/{asset.Path}");
                     break;
             }
         }
