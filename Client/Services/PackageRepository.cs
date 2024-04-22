@@ -2,6 +2,7 @@
 using System.Runtime.Loader;
 using System.Xml;
 using BlazorPlugin2.Shared;
+using BlazorPlugin2.Shared.DTOs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -17,7 +18,7 @@ public class PackageRepository(
     NavigationManager navigationManager)
     : IPackageRepository
 {
-    private const string ModuleManagerUrl = "/ModuleManager";
+    private const string ModuleManagerUrl = "/module-manager";
     
     private List<Package> _packages = [];
 
@@ -31,7 +32,8 @@ public class PackageRepository(
 
         try
         {
-            _packages = await http.GetFromJsonAsync<List<Package>>(ModuleManagerUrl) ?? [];
+            var response = await http.GetFromJsonAsync<CollectionResponse<Package>>(ModuleManagerUrl);
+            _packages = response?.Items ?? [];
         }
         catch (Exception e)
         {

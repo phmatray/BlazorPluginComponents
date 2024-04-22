@@ -8,6 +8,14 @@ namespace BlazorPlugin2.Shared;
 /// </summary>
 public class Package
 {
+    public static readonly string[] ValidFormats =
+    [
+        ".dll", ".pdb",
+        ".css", ".js",
+        ".png", ".jpg", ".jpeg", ".gif",
+        ".json", ".txt", ".csv"
+    ];
+
     /// <summary>
     /// Gets or sets the name of the package.
     /// </summary>

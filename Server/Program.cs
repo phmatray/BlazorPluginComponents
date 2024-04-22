@@ -1,3 +1,5 @@
+using BlazorPlugin2.Server.Packages;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -31,7 +33,10 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 
 app.MapRazorPages();
-app.MapControllers();
+
+app.MapPackageListEndpoint();
+app.MapPackageCreateEndpoint();
+
 app.MapFallbackToFile("index.html");
 
 app.Run();
