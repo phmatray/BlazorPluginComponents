@@ -1,4 +1,5 @@
 ﻿using BlazorPlugin2.Shared;
+using BlazorPlugin2.Shared.Models;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace BlazorPlugin2.Client.Services;

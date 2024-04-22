@@ -1,4 +1,4 @@
-namespace BlazorPlugin2.Shared;
+namespace BlazorPlugin2.Shared.Models;
 
 /// <summary>
 /// Represents an asset within a package, providing details about its type and file path.

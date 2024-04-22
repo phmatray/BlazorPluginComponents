@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Xml;
 
-namespace BlazorPlugin2.Shared;
+namespace BlazorPlugin2.Shared.Models;
 
 /// <summary>
 /// Represents a package that can be dynamically loaded into the application, including its assets and components.
