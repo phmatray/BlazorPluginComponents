@@ -1,5 +1,4 @@
 using BlazorPlugin2.Client.Services;
-using BlazorPlugin2.Shared;
 using BlazorPlugin2.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -43,7 +42,7 @@ public partial class ModuleManager
         string component = changeEventArgs.Value?.ToString() ?? "";
         _components.Add(package.Assembly?.GetType(component));
 
-        foreach (var asset in package.Assets)
+        foreach (Asset asset in package.Assets)
         {
             var id = $"{package.Name}{asset.Path[..asset.Path.LastIndexOf('.')]}";
 

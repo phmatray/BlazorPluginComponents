@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Runtime.Loader;
 using System.Xml;
-using BlazorPlugin2.Shared;
 using BlazorPlugin2.Shared.DTOs;
 using BlazorPlugin2.Shared.Models;
 using Microsoft.AspNetCore.Components;

@@ -1,4 +1,4 @@
-using BlazorPlugin2.Server.Packages;
+using BlazorPlugin2.Server.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,10 +33,7 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 
 app.MapRazorPages();
-
-app.MapPackageListEndpoint();
-app.MapPackageCreateEndpoint();
-
+app.MapEndpoints();
 app.MapFallbackToFile("index.html");
 
 app.Run();

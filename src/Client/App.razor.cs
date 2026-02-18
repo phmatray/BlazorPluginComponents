@@ -1,5 +1,4 @@
 using BlazorPlugin2.Client.Services;
-using BlazorPlugin2.Shared;
 using BlazorPlugin2.Shared.Models;
 using Microsoft.AspNetCore.Components;
 
@@ -19,14 +18,18 @@ public partial class App
     {
         _packages = await Repo.GetList();
         
-        foreach (var package in _packages)
+        foreach (Package package in _packages)
         {
             await Repo.Load(package);
-            
-            foreach (var asset in package.Assets)
-            {
-                await LoadAsset(package, asset);
-            }
+            await LoadAssets(package);
+        }
+    }
+
+    private async Task LoadAssets(Package package)
+    {
+        foreach (Asset asset in package.Assets)
+        {
+            await LoadAsset(package, asset);
         }
     }
 

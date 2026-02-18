@@ -16,7 +16,7 @@ public class ErrorModel(ILogger<ErrorModel> logger)
 
     public void OnGet()
     {
-        logger.LogError("An error occurred while processing your request.");
+        logger.LogError("An error occurred while processing your request");
         RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
     }
 }
